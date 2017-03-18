@@ -38,6 +38,17 @@ def custom_score(game, player):
     """
 
     # TODO: finish this function!
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - 2 * opp_moves)
+
     raise NotImplementedError
 
 
@@ -119,16 +130,33 @@ class CustomPlayer:
         self.time_left = time_left
 
         # TODO: finish this function!
-
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
+        if not legal_moves:
+            return (-1, -1)
 
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
+
+            # move = self.minimax(self, game)[1] # accept tuple from minimax function (2.0, (0,6))
+
+            if self.iterative:
+                depth = 1
+                while True:
+                    if self.method == "minimax":
+                        move = self.minimax(game, depth)[1]
+                    elif self.method == "alphabeta":
+                        move = self.alphabeta(game, depth)[1]
+                    depth += 1
+            else:
+                if self.method == "minimax":
+                    move = self.minimax(game, self.search_depth)[1]
+                elif self.method == "alphabeta":
+                    move = self.alphabeta(game, self.search_depth)[1]
             pass
 
         except Timeout:
@@ -136,6 +164,8 @@ class CustomPlayer:
             pass
 
         # Return the best move from the last completed search iteration
+        return move
+
         raise NotImplementedError
 
     def minimax(self, game, depth, maximizing_player=True):
@@ -173,6 +203,28 @@ class CustomPlayer:
             raise Timeout()
 
         # TODO: finish this function!
+        legal_moves = game.get_legal_moves()
+
+        if maximizing_player:
+            if depth == 0:
+                return self.score(game, self), (-1, -1)
+            elif depth == 1:
+                _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+            elif depth > 1:
+                trees = [(self.minimax(game.forecast_move(m), depth - 1, True)) for m in legal_moves]
+                _, move = max(trees)
+
+        if not maximizing_player:
+            if depth == 0:
+                return self.score(game, self), (-1, -1)
+            elif depth == 1:
+                _, move = min([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+            elif depth > 1:
+                trees = [(self.minimax(game.forecast_move(m), depth - 1, False)) for m in legal_moves]
+                _, move = min(trees)
+
+        return (_, move)
+
         raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):

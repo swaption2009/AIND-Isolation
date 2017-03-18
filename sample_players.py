@@ -93,6 +93,7 @@ def improved_score(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    # print("improved score: ", (own_moves - opp_moves))
     return float(own_moves - opp_moves)
 
 
@@ -134,7 +135,7 @@ class GreedyPlayer():
     equivalent to a minimax search agent with a search depth of one.
     """
 
-    def __init__(self, score_fn=open_move_score):
+    def __init__(self, score_fn=improved_score):
         self.score = score_fn
 
     def get_move(self, game, legal_moves, time_left):
@@ -167,6 +168,7 @@ class GreedyPlayer():
         if not legal_moves:
             return (-1, -1)
         _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+        # print(_, move)
         return move
 
 
