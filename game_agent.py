@@ -14,6 +14,43 @@ class Timeout(Exception):
     pass
 
 
+def custom_heuristic_1(game, player):
+    """
+    get aggressive moves
+    """
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - 2 * opp_moves)
+
+
+def custom_heuristic_2(game, player):
+    """
+    legal moves within center stage
+    """
+    center_stage = [(2, 2), (2, 3), (2, 4),
+                    (3, 2), (3, 3), (3, 4),
+                    (4, 2), (4, 3), (4, 4)]
+
+    own_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(game.get_opponent(player))
+
+    own_moves_duplicates = len([x for x in own_moves if center_stage.count(x) > 1])
+    opp_moves_duplicates = len([x for x in opp_moves if center_stage.count(x) > 1])
+
+    return float(own_moves_duplicates - opp_moves_duplicates)
+
+
+def custom_heuristic_3(game, player):
+    """
+    distance between player and opponent
+    """
+    own_location = game.get_player_location(player)
+    opp_location = game.get_player_location(game.get_opponent(player))
+
+    return float(abs(own_location[0]-opp_location[0] + abs(own_location[1]-opp_location[1])))
+
+
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
@@ -44,10 +81,7 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-    return float(own_moves - 2 * opp_moves)
+    return custom_heuristic_1(game, player) + custom_heuristic_2(game, player) + custom_heuristic_3(game, player)
 
     raise NotImplementedError
 
