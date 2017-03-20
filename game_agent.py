@@ -205,23 +205,18 @@ class CustomPlayer:
         # TODO: finish this function!
         legal_moves = game.get_legal_moves()
 
-        if maximizing_player:
-            if depth == 0:
-                return self.score(game, self), (-1, -1)
-            elif depth == 1:
-                _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
-            elif depth > 1:
-                trees = [(self.minimax(game.forecast_move(m), depth - 1, True)) for m in legal_moves]
-                _, move = max(trees)
+        if depth == 0 or len(legal_moves) == 0:
+            return self.score(game, self), (-1, -1)
 
-        if not maximizing_player:
-            if depth == 0:
-                return self.score(game, self), (-1, -1)
-            elif depth == 1:
-                _, move = min([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
-            elif depth > 1:
-                trees = [(self.minimax(game.forecast_move(m), depth - 1, False)) for m in legal_moves]
-                _, move = min(trees)
+        results = []
+        for m in legal_moves:
+            _, move = self.minimax(game.forecast_move(m), depth-1, not maximizing_player)
+            results.append((_, m))
+
+        if maximizing_player:
+            return max(results)
+        else:
+            return min(results)
 
         return (_, move)
 
@@ -269,4 +264,35 @@ class CustomPlayer:
             raise Timeout()
 
         # TODO: finish this function!
+        legal_moves = game.get_legal_moves()
+
+        if depth == 0 or len(legal_moves) == 0:
+            return self.score(game, self), (-1, -1)
+
+        if maximizing_player:
+            best_score = float("-inf")
+            best_move = (-1, -1)
+        else:
+            best_score = float("inf")
+            best_move = (-1, -1)
+
+        for m in legal_moves:
+            score, _ = self.alphabeta(game.forecast_move(m), depth-1, alpha, beta, not maximizing_player)
+            if maximizing_player:
+                if score > best_score:
+                    best_score = score
+                    best_move = m
+                if best_score >= beta:
+                    break
+                alpha = max(alpha, best_score)
+            else:
+                if score < best_score:
+                    best_score = score
+                    best_move = m
+                if best_score <= alpha:
+                    break
+                beta = min(beta, best_score)
+
+        return (best_score, best_move)
+
         raise NotImplementedError
