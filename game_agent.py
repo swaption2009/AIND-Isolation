@@ -83,8 +83,6 @@ def custom_score(game, player):
 
     return custom_heuristic_1(game, player) + custom_heuristic_2(game, player) + custom_heuristic_3(game, player)
 
-    raise NotImplementedError
-
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -200,7 +198,6 @@ class CustomPlayer:
         # Return the best move from the last completed search iteration
         return move
 
-        raise NotImplementedError
 
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
@@ -254,7 +251,6 @@ class CustomPlayer:
 
         return (_, move)
 
-        raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
         """Implement minimax search with alpha-beta pruning as described in the
@@ -328,5 +324,3 @@ class CustomPlayer:
                 beta = min(beta, best_score)
 
         return (best_score, best_move)
-
-        raise NotImplementedError
